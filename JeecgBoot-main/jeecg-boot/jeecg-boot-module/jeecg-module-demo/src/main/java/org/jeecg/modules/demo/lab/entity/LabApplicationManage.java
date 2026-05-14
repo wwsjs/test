@@ -68,6 +68,10 @@ public class LabApplicationManage implements Serializable {
 	@Excel(name = "用途或项目内容", width = 15)
     @Schema(description = "用途或项目内容")
     private java.lang.String purpose;
+	/**使用时间*/
+	@Excel(name = "使用时间", width = 15)
+    @Schema(description = "使用时间")
+    private java.math.BigDecimal actualHours;
 	/**申请状态*/
 	@Excel(name = "申请状态", width = 15, dicCode = "application_status")
 	@Dict(dicCode = "application_status")

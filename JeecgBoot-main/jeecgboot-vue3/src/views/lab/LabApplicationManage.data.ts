@@ -44,6 +44,11 @@ export const columns: BasicColumn[] = [
     dataIndex: 'purpose'
    },
    {
+    title: '使用时间',
+    align:"center",
+    dataIndex: 'actualHours'
+   },
+   {
     title: '申请状态',
     align:"center",
     dataIndex: 'status_dictText'
@@ -100,6 +105,16 @@ export const formSchema: FormSchema[] = [
     component: 'InputTextArea',
   },
   {
+    label: '使用时间',
+    field: 'actualHours',
+    component: 'InputNumber',
+    componentProps: {
+      min: 0.1,
+      precision: 2,
+      step: 0.5,
+    },
+  },
+  {
     label: '申请状态',
     field: 'status',
     component: 'JDictSelectTag',
@@ -124,7 +139,8 @@ export const superQuerySchema = {
   startDate: {title: '开始日期',order: 3,view: 'date', type: 'string',},
   endDate: {title: '结束日期',order: 4,view: 'date', type: 'string',},
   purpose: {title: '用途或项目内容',order: 5,view: 'textarea', type: 'string',},
-  status: {title: '申请状态',order: 6,view: 'sel_search', type: 'string',dictCode: 'application_status',},
+  actualHours: {title: '使用时间',order: 6,view: 'number', type: 'number',},
+  status: {title: '申请状态',order: 7,view: 'sel_search', type: 'string',dictCode: 'application_status',},
 };
 
 /**

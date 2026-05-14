@@ -1,16 +1,16 @@
 package org.jeecg.modules.demo.lab.service.impl;
 
-import org.jeecg.modules.demo.lab.entity.LabApplication;
 import org.jeecg.modules.demo.lab.entity.LabApplicationManage;
 import org.jeecg.modules.demo.lab.entity.LabUseRecord;
 import org.jeecg.modules.demo.lab.mapper.LabApplicationManageMapper;
 import org.jeecg.modules.demo.lab.service.ILabApplicationManageService;
+import org.jeecg.modules.demo.lab.service.ILabUseRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.jeecg.modules.demo.lab.entity.LabUseRecord;
-import org.jeecg.modules.demo.lab.service.ILabUseRecordService;
+
+import java.math.BigDecimal;
 /**
  * @Description: 申请管理
  * @Author: jeecg-boot
@@ -36,7 +36,7 @@ public class LabApplicationManageServiceImpl extends ServiceImpl<LabApplicationM
           record.setStartDate(entity.getStartDate());
           record.setEndDate(entity.getEndDate());
           record.setPurpose(entity.getPurpose());
-          record.setActualHours(0);
+          record.setActualHours(entity.getActualHours() == null ? BigDecimal.ZERO : entity.getActualHours());
 
           labUseRecordService.save(record);
       }
