@@ -38,6 +38,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+
+import java.math.BigDecimal;
  /**
  * @Description: 使用记录
  * @Author: jeecg-boot
@@ -87,6 +89,10 @@ public class LabUseRecordController extends JeecgController<LabUseRecord, ILabUs
 	@RequiresPermissions("lab:lab_use_record:add")
 	@PostMapping(value = "/add")
 	public Result<String> add(@RequestBody LabUseRecord labUseRecord) {
+		Result<String> checkResult = validateActualHours(labUseRecord.getActualHours());
+		if (!checkResult.isSuccess()) {
+			return checkResult;
+		}
 		labUseRecordService.save(labUseRecord);
 
 		return Result.OK("添加成功！");
@@ -103,6 +109,10 @@ public class LabUseRecordController extends JeecgController<LabUseRecord, ILabUs
 	@RequiresPermissions("lab:lab_use_record:edit")
 	@RequestMapping(value = "/edit", method = {RequestMethod.PUT,RequestMethod.POST})
 	public Result<String> edit(@RequestBody LabUseRecord labUseRecord) {
+		Result<String> checkResult = validateActualHours(labUseRecord.getActualHours());
+		if (!checkResult.isSuccess()) {
+			return checkResult;
+		}
 		labUseRecordService.updateById(labUseRecord);
 		return Result.OK("编辑成功!");
 	}
@@ -178,5 +188,15 @@ public class LabUseRecordController extends JeecgController<LabUseRecord, ILabUs
     public Result<?> importExcel(HttpServletRequest request, HttpServletResponse response) {
         return super.importExcel(request, response, LabUseRecord.class);
     }
+
+	private Result<String> validateActualHours(BigDecimal actualHours) {
+		if (actualHours == null) {
+			return Result.error("请填写实际上机时长");
+		}
+		if (actualHours.compareTo(BigDecimal.ZERO) <= 0) {
+			return Result.error("实际上机时长必须大于0");
+		}
+		return Result.OK();
+	}
 
 }

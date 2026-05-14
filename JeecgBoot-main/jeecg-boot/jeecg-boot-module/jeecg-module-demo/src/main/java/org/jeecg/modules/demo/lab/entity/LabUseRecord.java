@@ -38,8 +38,8 @@ public class LabUseRecord implements Serializable {
     @Schema(description = "使用记录ID")
     private java.lang.String id;
 	/**使用人ID*/
-	@Excel(name = "使用人ID", width = 15, dictTable = "sys_user", dicText = "realname", dicCode = "id")
-	@Dict(dictTable = "sys_user", dicText = "realname", dicCode = "id")
+	@Excel(name = "使用人ID", width = 15, dictTable = "lab_user", dicText = "username", dicCode = "id")
+	@Dict(dictTable = "lab_user", dicText = "username", dicCode = "id")
     @Schema(description = "使用人ID")
     private java.lang.String userId;
 	/**设备ID*/
@@ -71,7 +71,7 @@ public class LabUseRecord implements Serializable {
 	/**实际使用时间/小时*/
 	@Excel(name = "实际使用时间/小时", width = 15)
     @Schema(description = "实际使用时间/小时")
-    private java.lang.Integer actualHours;
+    private java.math.BigDecimal actualHours;
 	/**createTime*/
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")

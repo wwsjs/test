@@ -58,13 +58,13 @@ public class LabProject implements Serializable {
     @Schema(description = "结束时间")
     private java.util.Date endDate;
 	/**项目负责人ID*/
-	@Excel(name = "项目负责人ID", width = 15, dictTable = "sys_user", dicText = "realname", dicCode = "id")
-	@Dict(dictTable = "sys_user", dicText = "realname", dicCode = "id")
+	@Excel(name = "项目负责人ID", width = 15, dictTable = "lab_user", dicText = "username", dicCode = "id")
+	@Dict(dictTable = "lab_user", dicText = "username", dicCode = "id")
     @Schema(description = "项目负责人ID")
     private java.lang.String leaderId;
 	/**项目成员ID*/
-	@Excel(name = "项目成员ID", width = 15, dictTable = "sys_user", dicText = "realname", dicCode = "id")
-	@Dict(dictTable = "sys_user", dicText = "realname", dicCode = "id")
+	@Excel(name = "项目成员ID", width = 15, dictTable = "lab_user", dicText = "username", dicCode = "id")
+	@Dict(dictTable = "lab_user", dicText = "username", dicCode = "id")
     @Schema(description = "项目成员ID")
     private java.lang.String memberId;
 	/**合同经费*/

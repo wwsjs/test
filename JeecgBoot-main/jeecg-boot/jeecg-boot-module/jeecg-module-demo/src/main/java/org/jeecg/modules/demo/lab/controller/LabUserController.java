@@ -15,12 +15,14 @@ import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.query.QueryRuleEnum;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.demo.lab.entity.LabUser;
+import org.jeecg.modules.demo.lab.security.LabPermissionContext;
 import org.jeecg.modules.demo.lab.service.ILabUserService;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
@@ -51,6 +53,8 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 public class LabUserController extends JeecgController<LabUser, ILabUserService> {
 	@Autowired
 	private ILabUserService labUserService;
+	@Autowired
+	private LabPermissionContext labPermissionContext;
 	
 	/**
 	 * 分页列表查询
@@ -71,6 +75,8 @@ public class LabUserController extends JeecgController<LabUser, ILabUserService>
 
 
         QueryWrapper<LabUser> queryWrapper = QueryGenerator.initQueryWrapper(labUser, req.getParameterMap());
+		LabPermissionContext.CurrentLabUser currentUser = labPermissionContext.getCurrentUser();
+		labPermissionContext.appendGroupScope(queryWrapper, "group_id", currentUser);
 		Page<LabUser> page = new Page<LabUser>(pageNo, pageSize);
 		IPage<LabUser> pageList = labUserService.page(page, queryWrapper);
 		return Result.OK(pageList);
@@ -87,6 +93,12 @@ public class LabUserController extends JeecgController<LabUser, ILabUserService>
 	@RequiresPermissions("lab:lab_user:add")
 	@PostMapping(value = "/add")
 	public Result<String> add(@RequestBody LabUser labUser) {
+		LabPermissionContext.CurrentLabUser currentUser = labPermissionContext.getCurrentUser();
+		String writableGroupId = labPermissionContext.normalizeWritableGroupId(currentUser, labUser.getGroupId());
+		if (!currentUser.isSuperAdmin() && StringUtils.isBlank(writableGroupId)) {
+			return Result.error("仅允许维护本组人员信息");
+		}
+		labUser.setGroupId(writableGroupId);
 		labUserService.save(labUser);
 
 		return Result.OK("添加成功！");
@@ -103,6 +115,19 @@ public class LabUserController extends JeecgController<LabUser, ILabUserService>
 	@RequiresPermissions("lab:lab_user:edit")
 	@RequestMapping(value = "/edit", method = {RequestMethod.PUT,RequestMethod.POST})
 	public Result<String> edit(@RequestBody LabUser labUser) {
+		LabPermissionContext.CurrentLabUser currentUser = labPermissionContext.getCurrentUser();
+		LabUser dbEntity = labUserService.getById(labUser.getId());
+		if (dbEntity == null) {
+			return Result.error("未找到对应数据");
+		}
+		if (!labPermissionContext.isLabUserAccessible(currentUser, dbEntity)) {
+			return Result.error("无权编辑其他组人员");
+		}
+		String writableGroupId = labPermissionContext.normalizeWritableGroupId(currentUser, labUser.getGroupId());
+		if (!currentUser.isSuperAdmin() && StringUtils.isBlank(writableGroupId)) {
+			return Result.error("仅允许维护本组人员信息");
+		}
+		labUser.setGroupId(writableGroupId);
 		labUserService.updateById(labUser);
 		return Result.OK("编辑成功!");
 	}
@@ -118,6 +143,14 @@ public class LabUserController extends JeecgController<LabUser, ILabUserService>
 	@RequiresPermissions("lab:lab_user:delete")
 	@DeleteMapping(value = "/delete")
 	public Result<String> delete(@RequestParam(name="id",required=true) String id) {
+		LabPermissionContext.CurrentLabUser currentUser = labPermissionContext.getCurrentUser();
+		LabUser dbEntity = labUserService.getById(id);
+		if (dbEntity == null) {
+			return Result.error("未找到对应数据");
+		}
+		if (!labPermissionContext.isLabUserAccessible(currentUser, dbEntity)) {
+			return Result.error("无权删除其他组人员");
+		}
 		labUserService.removeById(id);
 		return Result.OK("删除成功!");
 	}
@@ -133,6 +166,13 @@ public class LabUserController extends JeecgController<LabUser, ILabUserService>
 	@RequiresPermissions("lab:lab_user:deleteBatch")
 	@DeleteMapping(value = "/deleteBatch")
 	public Result<String> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
+		LabPermissionContext.CurrentLabUser currentUser = labPermissionContext.getCurrentUser();
+		List<LabUser> list = labUserService.listByIds(Arrays.asList(ids.split(",")));
+		for (LabUser user : list) {
+			if (!labPermissionContext.isLabUserAccessible(currentUser, user)) {
+				return Result.error("无权批量删除其他组人员");
+			}
+		}
 		this.labUserService.removeByIds(Arrays.asList(ids.split(",")));
 		return Result.OK("批量删除成功!");
 	}
@@ -147,9 +187,13 @@ public class LabUserController extends JeecgController<LabUser, ILabUserService>
 	@Operation(summary="人员信息（非系统用户）-通过id查询")
 	@GetMapping(value = "/queryById")
 	public Result<LabUser> queryById(@RequestParam(name="id",required=true) String id) {
+		LabPermissionContext.CurrentLabUser currentUser = labPermissionContext.getCurrentUser();
 		LabUser labUser = labUserService.getById(id);
 		if(labUser==null) {
 			return Result.error("未找到对应数据");
+		}
+		if (!labPermissionContext.isLabUserAccessible(currentUser, labUser)) {
+			return Result.error("无权查看其他组人员");
 		}
 		return Result.OK(labUser);
 	}
@@ -163,6 +207,10 @@ public class LabUserController extends JeecgController<LabUser, ILabUserService>
     @RequiresPermissions("lab:lab_user:exportXls")
     @RequestMapping(value = "/exportXls")
     public ModelAndView exportXls(HttpServletRequest request, LabUser labUser) {
+        LabPermissionContext.CurrentLabUser currentUser = labPermissionContext.getCurrentUser();
+		if (!currentUser.isSuperAdmin()) {
+			labUser.setGroupId(currentUser.getGroupId());
+		}
         return super.exportXls(request, labUser, LabUser.class, "人员信息（非系统用户）");
     }
 

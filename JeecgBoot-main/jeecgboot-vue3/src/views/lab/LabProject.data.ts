@@ -110,7 +110,7 @@ export const formSchema: FormSchema[] = [
     field: 'leaderId',
     component: 'JSearchSelect',
     componentProps:{
-       dict:"sys_user,realname,id"
+       dict:"lab_user,username,id"
     },
     dynamicRules: ({model,schema}) => {
           return [
@@ -123,7 +123,7 @@ export const formSchema: FormSchema[] = [
     field: 'memberId',
     component: 'JSelectMultiple',
     componentProps:{
-        dictCode:"sys_user,realname,id"
+        dictCode:"lab_user,username,id"
      },
   },
   {
@@ -154,8 +154,8 @@ export const superQuerySchema = {
   projectName: {title: '项目名称',order: 1,view: 'text', type: 'string',},
   startDate: {title: '开始时间',order: 2,view: 'date', type: 'string',},
   endDate: {title: '结束时间',order: 3,view: 'date', type: 'string',},
-  leaderId: {title: '项目负责人ID',order: 4,view: 'sel_search', type: 'string',dictTable: "sys_user", dictCode: 'id', dictText: 'realname',},
-  memberId: {title: '项目成员ID',order: 5,view: 'list_multi', type: 'string',dictTable: "sys_user", dictCode: 'id', dictText: 'realname',},
+  leaderId: {title: '项目负责人ID',order: 4,view: 'sel_search', type: 'string',dictTable: "lab_user", dictCode: 'id', dictText: 'username',},
+  memberId: {title: '项目成员ID',order: 5,view: 'list_multi', type: 'string',dictTable: "lab_user", dictCode: 'id', dictText: 'username',},
   contractAmount: {title: '合同经费',order: 6,view: 'text', type: 'string',},
   groupId: {title: '所属组',order: 7,view: 'sel_search', type: 'string',dictTable: "lab_group", dictCode: 'group_id', dictText: 'mentor',},
 };
