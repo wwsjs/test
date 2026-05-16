@@ -15,7 +15,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
  * @Date:   2026-05-08
  * @Version: V1.0
  */
-@Service
+@Service("labLabApplicationServiceImpl")
 public class LabApplicationServiceImpl extends ServiceImpl<LabApplicationMapper, LabApplication> implements ILabApplicationService {
     @Override
     public boolean save(LabApplication entity) {

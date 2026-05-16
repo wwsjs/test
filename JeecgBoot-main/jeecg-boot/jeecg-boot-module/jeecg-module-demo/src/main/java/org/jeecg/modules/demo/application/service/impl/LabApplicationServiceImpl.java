@@ -13,7 +13,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
  * @Date:   2026-05-14
  * @Version: V1.0
  */
-@Service
+@Service("applicationLabApplicationServiceImpl")
 public class LabApplicationServiceImpl extends ServiceImpl<LabApplicationMapper, LabApplication> implements ILabApplicationService {
 
 }
