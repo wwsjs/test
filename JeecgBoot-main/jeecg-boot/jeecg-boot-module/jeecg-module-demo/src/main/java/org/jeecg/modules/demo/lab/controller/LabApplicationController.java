@@ -41,6 +41,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 
 import org.jeecg.common.system.vo.LoginUser;
 import org.apache.shiro.SecurityUtils;
+import java.math.BigDecimal;
  /**
  * @Description: 申请信息
  * @Author: jeecg-boot
@@ -93,6 +94,10 @@ public class LabApplicationController extends JeecgController<LabApplication, IL
 	@RequiresPermissions("lab:lab_application:add")
 	@PostMapping(value = "/add")
 	public Result<String> add(@RequestBody LabApplication labApplication) {
+		Result<String> checkResult = validateApplication(labApplication);
+		if (!checkResult.isSuccess()) {
+			return checkResult;
+		}
 		labApplicationService.save(labApplication);
 
 		return Result.OK("添加成功！");
@@ -109,6 +114,10 @@ public class LabApplicationController extends JeecgController<LabApplication, IL
 	@RequiresPermissions("lab:lab_application:edit")
 	@RequestMapping(value = "/edit", method = {RequestMethod.PUT,RequestMethod.POST})
 	public Result<String> edit(@RequestBody LabApplication labApplication) {
+		Result<String> checkResult = validateApplication(labApplication);
+		if (!checkResult.isSuccess()) {
+			return checkResult;
+		}
 		labApplicationService.updateById(labApplication);
 		return Result.OK("编辑成功!");
 	}
@@ -184,5 +193,19 @@ public class LabApplicationController extends JeecgController<LabApplication, IL
     public Result<?> importExcel(HttpServletRequest request, HttpServletResponse response) {
         return super.importExcel(request, response, LabApplication.class);
     }
+
+	private Result<String> validateApplication(LabApplication labApplication) {
+		if (oConvertUtils.isEmpty(labApplication.getUserId())) {
+			return Result.error("请填写用户ID");
+		}
+		BigDecimal actualHours = labApplication.getActualHours();
+		if (actualHours == null) {
+			return Result.error("请填写使用时间");
+		}
+		if (actualHours.compareTo(BigDecimal.ZERO) <= 0) {
+			return Result.error("使用时间必须大于0");
+		}
+		return Result.OK();
+	}
 
 }

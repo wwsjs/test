@@ -24,6 +24,7 @@ public class LabSchemaBootstrap implements ApplicationRunner {
                 "actual_hours",
                 "ALTER TABLE `lab_application` ADD COLUMN `actual_hours` DECIMAL(10,2) NULL COMMENT '使用时间' AFTER `purpose`"
         );
+        repairHistoricalData();
     }
 
     private void ensureColumnExists(String tableName, String columnName, String alterSql) {
@@ -50,5 +51,41 @@ public class LabSchemaBootstrap implements ApplicationRunner {
         log.warn("Schema bootstrap detected missing column {}.{} , applying DDL.", tableName, columnName);
         jdbcTemplate.execute(alterSql);
         log.info("Schema bootstrap applied DDL successfully for {}.{}", tableName, columnName);
+    }
+
+    private void repairHistoricalData() {
+        try {
+            int userIdPatched = jdbcTemplate.update(
+                    "UPDATE lab_use_record r " +
+                            "JOIN lab_application a " +
+                            "  ON a.equipment_id = r.equipment_id " +
+                            " AND a.project_id = r.project_id " +
+                            " AND a.start_date = r.start_date " +
+                            " AND a.end_date = r.end_date " +
+                            " AND a.purpose = r.purpose " +
+                            "SET r.user_id = a.user_id " +
+                            "WHERE (r.user_id IS NULL OR r.user_id = '') " +
+                            "  AND a.user_id IS NOT NULL " +
+                            "  AND a.user_id <> ''"
+            );
+            int actualHoursPatched = jdbcTemplate.update(
+                    "UPDATE lab_application a " +
+                            "JOIN lab_use_record r " +
+                            "  ON a.equipment_id = r.equipment_id " +
+                            " AND a.project_id = r.project_id " +
+                            " AND a.start_date = r.start_date " +
+                            " AND a.end_date = r.end_date " +
+                            " AND a.purpose = r.purpose " +
+                            "SET a.actual_hours = r.actual_hours " +
+                            "WHERE a.actual_hours IS NULL " +
+                            "  AND r.actual_hours IS NOT NULL"
+            );
+            if (userIdPatched > 0 || actualHoursPatched > 0) {
+                log.info("Schema bootstrap repaired data. patched user_id rows={}, patched actual_hours rows={}",
+                        userIdPatched, actualHoursPatched);
+            }
+        } catch (Exception ex) {
+            log.warn("Schema bootstrap data repair skipped due to exception: {}", ex.getMessage());
+        }
     }
 }

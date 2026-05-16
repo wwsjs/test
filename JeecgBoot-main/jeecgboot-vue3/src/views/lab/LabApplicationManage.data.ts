@@ -64,7 +64,7 @@ export const formSchema: FormSchema[] = [
     field: 'userId',
     component: 'JSearchSelect',
     componentProps:{
-       dict:"sys_user,realname,id"
+       dict:"lab_user,username,id"
     },
   },
   {
@@ -133,7 +133,7 @@ export const formSchema: FormSchema[] = [
 
 // 高级查询数据
 export const superQuerySchema = {
-  userId: {title: '用户ID',order: 0,view: 'sel_search', type: 'string',dictTable: "sys_user", dictCode: 'id', dictText: 'realname',},
+  userId: {title: '用户ID',order: 0,view: 'sel_search', type: 'string',dictTable: "lab_user", dictCode: 'id', dictText: 'username',},
   equipmentId: {title: '设备ID',order: 1,view: 'sel_search', type: 'string',dictTable: "lab_equipment", dictCode: 'id', dictText: 'equipment_name',},
   projectId: {title: '项目ID',order: 2,view: 'sel_search', type: 'string',dictTable: "lab_project", dictCode: 'id', dictText: 'project_name',},
   startDate: {title: '开始日期',order: 3,view: 'date', type: 'string',},

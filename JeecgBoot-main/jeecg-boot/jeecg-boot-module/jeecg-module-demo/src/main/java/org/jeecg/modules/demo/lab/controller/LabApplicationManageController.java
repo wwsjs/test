@@ -38,6 +38,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import java.math.BigDecimal;
  /**
  * @Description: 申请管理
  * @Author: jeecg-boot
@@ -103,6 +104,15 @@ public class LabApplicationManageController extends JeecgController<LabApplicati
 	@RequiresPermissions("lab:lab_application:edit")
 	@RequestMapping(value = "/edit", method = {RequestMethod.PUT,RequestMethod.POST})
 	public Result<String> edit(@RequestBody LabApplicationManage labApplicationManage) {
+		if ("approved".equals(labApplicationManage.getStatus())) {
+			if (oConvertUtils.isEmpty(labApplicationManage.getUserId())) {
+				return Result.error("审批通过时用户ID不能为空");
+			}
+			if (labApplicationManage.getActualHours() == null
+					|| labApplicationManage.getActualHours().compareTo(BigDecimal.ZERO) <= 0) {
+				return Result.error("审批通过时使用时间必须大于0");
+			}
+		}
 		labApplicationManageService.updateById(labApplicationManage);
 		return Result.OK("编辑成功!");
 	}
