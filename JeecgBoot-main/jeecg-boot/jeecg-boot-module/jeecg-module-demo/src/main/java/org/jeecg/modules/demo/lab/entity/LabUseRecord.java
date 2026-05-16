@@ -38,8 +38,8 @@ public class LabUseRecord implements Serializable {
     @Schema(description = "使用记录ID")
     private java.lang.String id;
 	/**使用人ID*/
-	@Excel(name = "使用人ID", width = 15, dictTable = "lab_user", dicText = "username", dicCode = "id")
-	@Dict(dictTable = "lab_user", dicText = "username", dicCode = "id")
+	@Excel(name = "使用人ID", width = 15, dictTable = "sys_user", dicText = "username", dicCode = "id")
+	@Dict(dictTable = "sys_user", dicText = "username", dicCode = "id")
     @Schema(description = "使用人ID")
     private java.lang.String userId;
 	/**设备ID*/

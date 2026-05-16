@@ -38,8 +38,8 @@ public class LabApplicationManage implements Serializable {
     @Schema(description = "使用记录ID")
     private java.lang.String id;
 	/**用户ID*/
-	@Excel(name = "用户ID", width = 15, dictTable = "lab_user", dicText = "username", dicCode = "id")
-	@Dict(dictTable = "lab_user", dicText = "username", dicCode = "id")
+	@Excel(name = "用户ID", width = 15, dictTable = "sys_user", dicText = "username", dicCode = "id")
+	@Dict(dictTable = "sys_user", dicText = "username", dicCode = "id")
     @Schema(description = "用户ID")
     private java.lang.String userId;
 	/**设备ID*/

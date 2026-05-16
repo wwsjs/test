@@ -9,7 +9,7 @@ export const columns: BasicColumn[] = [
     title: '使用人',
     align:"center",
     dataIndex: 'userId_dictText',
-    customRender: ({ text }) => text || '-'
+    customRender: ({ text, record }) => text || record?.userId || '-'
    },
    {
     title: '设备ID',
@@ -61,7 +61,7 @@ export const formSchema: FormSchema[] = [
     field: 'userId',
     component: 'JSearchSelect',
     componentProps:{
-       dict:"lab_user,username,id"
+       dict:"sys_user,username,id"
     },
     dynamicRules: ({model,schema}) => {
           return [
@@ -152,7 +152,7 @@ export const formSchema: FormSchema[] = [
 
 // 高级查询数据
 export const superQuerySchema = {
-  userId: {title: '使用人ID',order: 0,view: 'sel_search', type: 'string',dictTable: "lab_user", dictCode: 'id', dictText: 'username',},
+  userId: {title: '使用人ID',order: 0,view: 'sel_search', type: 'string',dictTable: "sys_user", dictCode: 'id', dictText: 'username',},
   equipmentId: {title: '设备ID',order: 1,view: 'sel_search', type: 'string',dictTable: "lab_equipment", dictCode: 'id', dictText: 'equipment_name',},
   projectId: {title: '依托项目ID',order: 2,view: 'sel_search', type: 'string',dictTable: "lab_project", dictCode: 'id', dictText: 'project_name',},
   startDate: {title: '开始日期',order: 3,view: 'date', type: 'string',},
