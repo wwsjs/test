@@ -94,6 +94,15 @@ public class LabProjectController extends JeecgController<LabProject, ILabProjec
 	@PostMapping(value = "/add")
 	public Result<String> add(@RequestBody LabProject labProject) {
 		LabPermissionContext.CurrentLabUser currentUser = labPermissionContext.getCurrentUser();
+		if (!canManageProjects(currentUser)) {
+			return Result.error("仅超级管理员或组长可维护项目");
+		}
+		if (StringUtils.isBlank(labProject.getLeaderId())) {
+			return Result.error("项目负责人不能为空");
+		}
+		if (StringUtils.isBlank(labProject.getMemberId())) {
+			labProject.setMemberId(labProject.getLeaderId());
+		}
 		String writableGroupId = labPermissionContext.normalizeWritableGroupId(currentUser, labProject.getGroupId());
 		if (!currentUser.isSuperAdmin() && StringUtils.isBlank(writableGroupId)) {
 			return Result.error("仅允许维护本组项目信息");
@@ -116,6 +125,15 @@ public class LabProjectController extends JeecgController<LabProject, ILabProjec
 	@RequestMapping(value = "/edit", method = {RequestMethod.PUT,RequestMethod.POST})
 	public Result<String> edit(@RequestBody LabProject labProject) {
 		LabPermissionContext.CurrentLabUser currentUser = labPermissionContext.getCurrentUser();
+		if (!canManageProjects(currentUser)) {
+			return Result.error("仅超级管理员或组长可维护项目");
+		}
+		if (StringUtils.isBlank(labProject.getLeaderId())) {
+			return Result.error("项目负责人不能为空");
+		}
+		if (StringUtils.isBlank(labProject.getMemberId())) {
+			labProject.setMemberId(labProject.getLeaderId());
+		}
 		LabProject dbEntity = labProjectService.getById(labProject.getId());
 		if (dbEntity == null) {
 			return Result.error("未找到对应数据");
@@ -144,6 +162,9 @@ public class LabProjectController extends JeecgController<LabProject, ILabProjec
 	@DeleteMapping(value = "/delete")
 	public Result<String> delete(@RequestParam(name="id",required=true) String id) {
 		LabPermissionContext.CurrentLabUser currentUser = labPermissionContext.getCurrentUser();
+		if (!canManageProjects(currentUser)) {
+			return Result.error("仅超级管理员或组长可维护项目");
+		}
 		LabProject dbEntity = labProjectService.getById(id);
 		if (dbEntity == null) {
 			return Result.error("未找到对应数据");
@@ -167,6 +188,9 @@ public class LabProjectController extends JeecgController<LabProject, ILabProjec
 	@DeleteMapping(value = "/deleteBatch")
 	public Result<String> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
 		LabPermissionContext.CurrentLabUser currentUser = labPermissionContext.getCurrentUser();
+		if (!canManageProjects(currentUser)) {
+			return Result.error("仅超级管理员或组长可维护项目");
+		}
 		List<LabProject> list = labProjectService.listByIds(Arrays.asList(ids.split(",")));
 		for (LabProject project : list) {
 			if (!labPermissionContext.isGroupAccessible(currentUser, project.getGroupId())) {
@@ -224,7 +248,15 @@ public class LabProjectController extends JeecgController<LabProject, ILabProjec
     @RequiresPermissions("lab:lab_project:importExcel")
     @RequestMapping(value = "/importExcel", method = RequestMethod.POST)
     public Result<?> importExcel(HttpServletRequest request, HttpServletResponse response) {
+		LabPermissionContext.CurrentLabUser currentUser = labPermissionContext.getCurrentUser();
+		if (!canManageProjects(currentUser)) {
+			return Result.error("仅超级管理员或组长可维护项目");
+		}
         return super.importExcel(request, response, LabProject.class);
     }
+
+	private boolean canManageProjects(LabPermissionContext.CurrentLabUser currentUser) {
+		return currentUser.isSuperAdmin() || currentUser.isGroupLeader();
+	}
 
 }

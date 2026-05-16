@@ -98,6 +98,11 @@ public class LabPermissionContext {
             return byUsername;
         }
 
+        LabUser byWorkNo = findByWorkNo(loginUser.getUsername());
+        if (byWorkNo != null) {
+            return byWorkNo;
+        }
+
         return findByUsername(loginUser.getRealname());
     }
 
@@ -108,6 +113,16 @@ public class LabPermissionContext {
         LambdaQueryWrapper<LabUser> query = new LambdaQueryWrapper<LabUser>()
             .eq(LabUser::getUsername, username)
             .last("limit 1");
+        return labUserMapper.selectOne(query);
+    }
+
+    private LabUser findByWorkNo(String workNo) {
+        if (StringUtils.isBlank(workNo)) {
+            return null;
+        }
+        LambdaQueryWrapper<LabUser> query = new LambdaQueryWrapper<LabUser>()
+                .eq(LabUser::getWorkNo, workNo)
+                .last("limit 1");
         return labUserMapper.selectOne(query);
     }
 

@@ -6,10 +6,10 @@ import { getWeekMonthQuarterYear } from '/@/utils';
 //列表数据
 export const columns: BasicColumn[] = [
    {
-    title: '用户ID',
+    title: '使用人',
     align:"center",
     dataIndex: 'userId_dictText',
-    customRender: ({ text, record }) => text || record?.userId || '-'
+    customRender: ({ text }) => text || '-'
    },
    {
     title: '设备ID',
@@ -62,7 +62,7 @@ export const searchFormSchema: FormSchema[] = [
 //表单数据
 export const formSchema: FormSchema[] = [
   {
-    label: '用户ID',
+    label: '使用人',
     field: 'userId',
     component: 'JSearchSelect',
     componentProps:{
@@ -135,7 +135,7 @@ export const formSchema: FormSchema[] = [
 
 // 高级查询数据
 export const superQuerySchema = {
-  userId: {title: '用户ID',order: 0,view: 'sel_search', type: 'string',dictTable: "lab_user", dictCode: 'id', dictText: 'username',},
+  userId: {title: '使用人',order: 0,view: 'sel_search', type: 'string',dictTable: "lab_user", dictCode: 'id', dictText: 'username',},
   equipmentId: {title: '设备ID',order: 1,view: 'sel_search', type: 'string',dictTable: "lab_equipment", dictCode: 'id', dictText: 'equipment_name',},
   projectId: {title: '项目ID',order: 2,view: 'sel_search', type: 'string',dictTable: "lab_project", dictCode: 'id', dictText: 'project_name',},
   startDate: {title: '开始日期',order: 3,view: 'date', type: 'string',},

@@ -94,6 +94,9 @@ public class LabUserController extends JeecgController<LabUser, ILabUserService>
 	@PostMapping(value = "/add")
 	public Result<String> add(@RequestBody LabUser labUser) {
 		LabPermissionContext.CurrentLabUser currentUser = labPermissionContext.getCurrentUser();
+		if (!canManageMembers(currentUser)) {
+			return Result.error("仅超级管理员或组长可维护组员名单");
+		}
 		String writableGroupId = labPermissionContext.normalizeWritableGroupId(currentUser, labUser.getGroupId());
 		if (!currentUser.isSuperAdmin() && StringUtils.isBlank(writableGroupId)) {
 			return Result.error("仅允许维护本组人员信息");
@@ -116,6 +119,9 @@ public class LabUserController extends JeecgController<LabUser, ILabUserService>
 	@RequestMapping(value = "/edit", method = {RequestMethod.PUT,RequestMethod.POST})
 	public Result<String> edit(@RequestBody LabUser labUser) {
 		LabPermissionContext.CurrentLabUser currentUser = labPermissionContext.getCurrentUser();
+		if (!canManageMembers(currentUser)) {
+			return Result.error("仅超级管理员或组长可维护组员名单");
+		}
 		LabUser dbEntity = labUserService.getById(labUser.getId());
 		if (dbEntity == null) {
 			return Result.error("未找到对应数据");
@@ -144,6 +150,9 @@ public class LabUserController extends JeecgController<LabUser, ILabUserService>
 	@DeleteMapping(value = "/delete")
 	public Result<String> delete(@RequestParam(name="id",required=true) String id) {
 		LabPermissionContext.CurrentLabUser currentUser = labPermissionContext.getCurrentUser();
+		if (!canManageMembers(currentUser)) {
+			return Result.error("仅超级管理员或组长可维护组员名单");
+		}
 		LabUser dbEntity = labUserService.getById(id);
 		if (dbEntity == null) {
 			return Result.error("未找到对应数据");
@@ -167,6 +176,9 @@ public class LabUserController extends JeecgController<LabUser, ILabUserService>
 	@DeleteMapping(value = "/deleteBatch")
 	public Result<String> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
 		LabPermissionContext.CurrentLabUser currentUser = labPermissionContext.getCurrentUser();
+		if (!canManageMembers(currentUser)) {
+			return Result.error("仅超级管理员或组长可维护组员名单");
+		}
 		List<LabUser> list = labUserService.listByIds(Arrays.asList(ids.split(",")));
 		for (LabUser user : list) {
 			if (!labPermissionContext.isLabUserAccessible(currentUser, user)) {
@@ -224,7 +236,15 @@ public class LabUserController extends JeecgController<LabUser, ILabUserService>
     @RequiresPermissions("lab:lab_user:importExcel")
     @RequestMapping(value = "/importExcel", method = RequestMethod.POST)
     public Result<?> importExcel(HttpServletRequest request, HttpServletResponse response) {
+		LabPermissionContext.CurrentLabUser currentUser = labPermissionContext.getCurrentUser();
+		if (!canManageMembers(currentUser)) {
+			return Result.error("仅超级管理员或组长可维护组员名单");
+		}
         return super.importExcel(request, response, LabUser.class);
     }
+
+	private boolean canManageMembers(LabPermissionContext.CurrentLabUser currentUser) {
+		return currentUser.isSuperAdmin() || currentUser.isGroupLeader();
+	}
 
 }

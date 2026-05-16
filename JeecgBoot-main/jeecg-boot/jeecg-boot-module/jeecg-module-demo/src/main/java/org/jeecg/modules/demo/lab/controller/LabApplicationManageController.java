@@ -15,6 +15,7 @@ import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.query.QueryRuleEnum;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.demo.lab.entity.LabApplicationManage;
+import org.jeecg.modules.demo.lab.security.LabPermissionContext;
 import org.jeecg.modules.demo.lab.service.ILabApplicationManageService;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -52,6 +53,8 @@ import java.math.BigDecimal;
 public class LabApplicationManageController extends JeecgController<LabApplicationManage, ILabApplicationManageService> {
 	@Autowired
 	private ILabApplicationManageService labApplicationManageService;
+	@Autowired
+	private LabPermissionContext labPermissionContext;
 	
 	/**
 	 * 分页列表查询
@@ -88,6 +91,13 @@ public class LabApplicationManageController extends JeecgController<LabApplicati
 	@RequiresPermissions("lab:lab_application:add")
 	@PostMapping(value = "/add")
 	public Result<String> add(@RequestBody LabApplicationManage labApplicationManage) {
+		LabPermissionContext.CurrentLabUser currentUser = labPermissionContext.getCurrentUser();
+		if (!canManageApplications(currentUser)) {
+			return Result.error("仅超级管理员或组长可维护申请管理");
+		}
+		if (!isValidActualHours(labApplicationManage.getActualHours())) {
+			return Result.error("使用时间必须大于0");
+		}
 		labApplicationManageService.save(labApplicationManage);
 
 		return Result.OK("添加成功！");
@@ -104,6 +114,13 @@ public class LabApplicationManageController extends JeecgController<LabApplicati
 	@RequiresPermissions("lab:lab_application:edit")
 	@RequestMapping(value = "/edit", method = {RequestMethod.PUT,RequestMethod.POST})
 	public Result<String> edit(@RequestBody LabApplicationManage labApplicationManage) {
+		LabPermissionContext.CurrentLabUser currentUser = labPermissionContext.getCurrentUser();
+		if (!canManageApplications(currentUser)) {
+			return Result.error("仅超级管理员或组长可维护申请管理");
+		}
+		if (!isValidActualHours(labApplicationManage.getActualHours())) {
+			return Result.error("使用时间必须大于0");
+		}
 		if ("approved".equals(labApplicationManage.getStatus())) {
 			if (oConvertUtils.isEmpty(labApplicationManage.getUserId())) {
 				return Result.error("审批通过时用户ID不能为空");
@@ -128,6 +145,10 @@ public class LabApplicationManageController extends JeecgController<LabApplicati
 	@RequiresPermissions("lab:lab_application:delete")
 	@DeleteMapping(value = "/delete")
 	public Result<String> delete(@RequestParam(name="id",required=true) String id) {
+		LabPermissionContext.CurrentLabUser currentUser = labPermissionContext.getCurrentUser();
+		if (!canManageApplications(currentUser)) {
+			return Result.error("仅超级管理员或组长可维护申请管理");
+		}
 		labApplicationManageService.removeById(id);
 		return Result.OK("删除成功!");
 	}
@@ -143,6 +164,10 @@ public class LabApplicationManageController extends JeecgController<LabApplicati
 	@RequiresPermissions("lab:lab_application:deleteBatch")
 	@DeleteMapping(value = "/deleteBatch")
 	public Result<String> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
+		LabPermissionContext.CurrentLabUser currentUser = labPermissionContext.getCurrentUser();
+		if (!canManageApplications(currentUser)) {
+			return Result.error("仅超级管理员或组长可维护申请管理");
+		}
 		this.labApplicationManageService.removeByIds(Arrays.asList(ids.split(",")));
 		return Result.OK("批量删除成功!");
 	}
@@ -186,7 +211,19 @@ public class LabApplicationManageController extends JeecgController<LabApplicati
     @RequiresPermissions("lab:lab_application:importExcel")
     @RequestMapping(value = "/importExcel", method = RequestMethod.POST)
     public Result<?> importExcel(HttpServletRequest request, HttpServletResponse response) {
+		LabPermissionContext.CurrentLabUser currentUser = labPermissionContext.getCurrentUser();
+		if (!canManageApplications(currentUser)) {
+			return Result.error("仅超级管理员或组长可维护申请管理");
+		}
         return super.importExcel(request, response, LabApplicationManage.class);
     }
+
+	private boolean canManageApplications(LabPermissionContext.CurrentLabUser currentUser) {
+		return currentUser.isSuperAdmin() || currentUser.isGroupLeader();
+	}
+
+	private boolean isValidActualHours(BigDecimal actualHours) {
+		return actualHours != null && actualHours.compareTo(BigDecimal.ZERO) > 0;
+	}
 
 }

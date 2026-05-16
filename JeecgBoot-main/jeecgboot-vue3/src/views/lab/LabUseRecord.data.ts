@@ -6,10 +6,10 @@ import { getWeekMonthQuarterYear } from '/@/utils';
 //列表数据
 export const columns: BasicColumn[] = [
    {
-    title: '使用人ID',
+    title: '使用人',
     align:"center",
     dataIndex: 'userId_dictText',
-    customRender: ({ text, record }) => text || record?.userId || '-'
+    customRender: ({ text }) => text || '-'
    },
    {
     title: '设备ID',
