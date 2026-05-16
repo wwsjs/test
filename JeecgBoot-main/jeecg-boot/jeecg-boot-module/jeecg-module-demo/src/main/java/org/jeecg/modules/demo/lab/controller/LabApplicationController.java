@@ -48,7 +48,7 @@ import org.apache.shiro.SecurityUtils;
  * @Version: V1.0
  */
 @Tag(name="申请信息")
-@RestController
+@RestController("labLabApplicationController")
 @RequestMapping("/lab/labApplication")
 @Slf4j
 public class LabApplicationController extends JeecgController<LabApplication, ILabApplicationService> {

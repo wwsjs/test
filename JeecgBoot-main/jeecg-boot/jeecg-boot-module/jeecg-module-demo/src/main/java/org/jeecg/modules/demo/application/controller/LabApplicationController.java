@@ -45,7 +45,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
  * @Version: V1.0
  */
 @Tag(name="该表存储申请信息")
-@RestController
+@RestController("applicationLabApplicationController")
 @RequestMapping("/application/labApplication")
 @Slf4j
 public class LabApplicationController extends JeecgController<LabApplication, ILabApplicationService> {
