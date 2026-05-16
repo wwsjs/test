@@ -9,6 +9,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.Environment;
 
@@ -23,6 +25,13 @@ import java.util.Map;
 */
 @Slf4j
 @SpringBootApplication(exclude = MongoAutoConfiguration.class)
+@ComponentScan(
+        basePackages = "org.jeecg",
+        excludeFilters = @ComponentScan.Filter(
+                type = FilterType.REGEX,
+                pattern = "org\\.jeecg\\.modules\\.legacy\\..*"
+        )
+)
 @ImportAutoConfiguration(JustAuthAutoConfiguration.class)  // spring boot 3.x justauth 兼容性处理
 public class JeecgSystemApplication extends SpringBootServletInitializer {
 

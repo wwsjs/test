@@ -21,6 +21,7 @@ import org.jeecg.common.util.TokenUtils;
 import org.jeecg.common.util.oConvertUtils;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.FullyQualifiedAnnotationBeanNameGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -36,7 +37,10 @@ import java.util.List;
  */
 @Slf4j
 @Configuration
-@MapperScan(value={"org.jeecg.**.mapper*"})
+@MapperScan(
+        value = {"org.jeecg.**.mapper*"},
+        nameGenerator = FullyQualifiedAnnotationBeanNameGenerator.class
+)
 public class MybatisPlusSaasConfig {
     @Autowired
     private DataSource dataSource;
