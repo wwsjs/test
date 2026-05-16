@@ -62,7 +62,7 @@ public class LabSchemaBootstrap implements ApplicationRunner {
                             " AND a.project_id = r.project_id " +
                             " AND a.start_date = r.start_date " +
                             " AND a.end_date = r.end_date " +
-                            " AND a.purpose = r.purpose " +
+                            " AND COALESCE(TRIM(a.purpose), '') = COALESCE(TRIM(r.purpose), '') " +
                             "SET r.user_id = a.user_id " +
                             "WHERE (r.user_id IS NULL OR r.user_id = '') " +
                             "  AND a.user_id IS NOT NULL " +
@@ -75,14 +75,48 @@ public class LabSchemaBootstrap implements ApplicationRunner {
                             " AND a.project_id = r.project_id " +
                             " AND a.start_date = r.start_date " +
                             " AND a.end_date = r.end_date " +
-                            " AND a.purpose = r.purpose " +
+                            " AND COALESCE(TRIM(a.purpose), '') = COALESCE(TRIM(r.purpose), '') " +
                             "SET a.actual_hours = r.actual_hours " +
-                            "WHERE a.actual_hours IS NULL " +
-                            "  AND r.actual_hours IS NOT NULL"
+                            "WHERE (a.actual_hours IS NULL OR a.actual_hours <= 0) " +
+                            "  AND r.actual_hours IS NOT NULL " +
+                            "  AND r.actual_hours > 0"
             );
-            if (userIdPatched > 0 || actualHoursPatched > 0) {
-                log.info("Schema bootstrap repaired data. patched user_id rows={}, patched actual_hours rows={}",
-                        userIdPatched, actualHoursPatched);
+            int reverseUserIdPatched = jdbcTemplate.update(
+                    "UPDATE lab_application a " +
+                            "JOIN lab_use_record r " +
+                            "  ON a.equipment_id = r.equipment_id " +
+                            " AND a.project_id = r.project_id " +
+                            " AND a.start_date = r.start_date " +
+                            " AND a.end_date = r.end_date " +
+                            " AND COALESCE(TRIM(a.purpose), '') = COALESCE(TRIM(r.purpose), '') " +
+                            "SET a.user_id = r.user_id " +
+                            "WHERE (a.user_id IS NULL OR a.user_id = '') " +
+                            "  AND r.user_id IS NOT NULL " +
+                            "  AND r.user_id <> ''"
+            );
+            int reverseHoursPatched = jdbcTemplate.update(
+                    "UPDATE lab_use_record r " +
+                            "JOIN lab_application a " +
+                            "  ON a.equipment_id = r.equipment_id " +
+                            " AND a.project_id = r.project_id " +
+                            " AND a.start_date = r.start_date " +
+                            " AND a.end_date = r.end_date " +
+                            " AND COALESCE(TRIM(a.purpose), '') = COALESCE(TRIM(r.purpose), '') " +
+                            "SET r.actual_hours = a.actual_hours " +
+                            "WHERE (r.actual_hours IS NULL OR r.actual_hours <= 0) " +
+                            "  AND a.actual_hours IS NOT NULL " +
+                            "  AND a.actual_hours > 0"
+            );
+            int memberIdPatched = jdbcTemplate.update(
+                    "UPDATE lab_project SET member_id = leader_id " +
+                            "WHERE (member_id IS NULL OR member_id = '') " +
+                            "  AND leader_id IS NOT NULL AND leader_id <> ''"
+            );
+            if (userIdPatched > 0 || actualHoursPatched > 0 || reverseUserIdPatched > 0 || reverseHoursPatched > 0 || memberIdPatched > 0) {
+                log.info(
+                        "Schema bootstrap repaired data. useRecord.user_id={}, application.actual_hours={}, application.user_id={}, useRecord.actual_hours={}, project.member_id={}",
+                        userIdPatched, actualHoursPatched, reverseUserIdPatched, reverseHoursPatched, memberIdPatched
+                );
             }
         } catch (Exception ex) {
             log.warn("Schema bootstrap data repair skipped due to exception: {}", ex.getMessage());

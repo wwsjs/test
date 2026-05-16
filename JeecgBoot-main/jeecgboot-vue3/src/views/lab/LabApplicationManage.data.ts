@@ -8,7 +8,8 @@ export const columns: BasicColumn[] = [
    {
     title: '用户ID',
     align:"center",
-    dataIndex: 'userId_dictText'
+    dataIndex: 'userId_dictText',
+    customRender: ({ text, record }) => text || record?.userId || '-'
    },
    {
     title: '设备ID',
@@ -46,7 +47,8 @@ export const columns: BasicColumn[] = [
    {
     title: '使用时间',
     align:"center",
-    dataIndex: 'actualHours'
+    dataIndex: 'actualHours',
+    customRender: ({ text }) => (text === null || text === undefined || text === '') ? '-' : text
    },
    {
     title: '申请状态',

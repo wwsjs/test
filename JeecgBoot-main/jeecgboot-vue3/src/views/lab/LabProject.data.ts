@@ -36,12 +36,14 @@ export const columns: BasicColumn[] = [
    {
     title: '项目负责人ID',
     align:"center",
-    dataIndex: 'leaderId_dictText'
+    dataIndex: 'leaderId_dictText',
+    customRender: ({ text, record }) => text || record?.leaderId || '-'
    },
    {
     title: '项目成员ID',
     align:"center",
-    dataIndex: 'memberId_dictText'
+    dataIndex: 'memberId_dictText',
+    customRender: ({ text, record }) => text || record?.memberId || '-'
    },
    {
     title: '合同经费',
