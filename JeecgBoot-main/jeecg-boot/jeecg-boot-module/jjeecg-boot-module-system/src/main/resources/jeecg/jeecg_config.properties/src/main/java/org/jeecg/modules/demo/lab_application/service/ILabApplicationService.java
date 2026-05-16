@@ -1,6 +1,6 @@
-package org.jeecg.modules.demo.lab_application.service;
+package org.jeecg.modules.legacy.lab_application.service;
 
-import org.jeecg.modules.demo.lab_application.entity.LabApplication;
+import org.jeecg.modules.legacy.lab_application.entity.LabApplication;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**

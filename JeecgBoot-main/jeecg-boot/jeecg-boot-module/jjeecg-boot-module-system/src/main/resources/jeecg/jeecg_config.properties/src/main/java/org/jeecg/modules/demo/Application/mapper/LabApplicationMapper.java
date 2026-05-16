@@ -1,9 +1,9 @@
-package org.jeecg.modules.demo.Application.mapper;
+package org.jeecg.modules.legacy.application.mapper;
 
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
-import org.jeecg.modules.demo.Application.entity.LabApplication;
+import org.jeecg.modules.legacy.application.entity.LabApplication;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**

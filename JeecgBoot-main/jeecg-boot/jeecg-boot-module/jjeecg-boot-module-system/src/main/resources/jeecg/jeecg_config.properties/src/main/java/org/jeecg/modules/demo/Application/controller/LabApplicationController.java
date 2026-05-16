@@ -1,4 +1,4 @@
-package org.jeecg.modules.demo.Application.controller;
+package org.jeecg.modules.legacy.application.controller;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -14,8 +14,8 @@ import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.query.QueryRuleEnum;
 import org.jeecg.common.util.oConvertUtils;
-import org.jeecg.modules.demo.Application.entity.LabApplication;
-import org.jeecg.modules.demo.Application.service.ILabApplicationService;
+import org.jeecg.modules.legacy.application.entity.LabApplication;
+import org.jeecg.modules.legacy.application.service.ILabApplicationService;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -45,7 +45,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
  * @Version: V1.0
  */
 @Tag(name="该表存储申请信息")
-@RestController
+@RestController("legacyApplicationLabApplicationController")
 @RequestMapping("/Application/labApplication")
 @Slf4j
 public class LabApplicationController extends JeecgController<LabApplication, ILabApplicationService> {

@@ -1,8 +1,8 @@
-package org.jeecg.modules.demo.lab_application.service.impl;
+package org.jeecg.modules.legacy.lab_application.service.impl;
 
-import org.jeecg.modules.demo.lab_application.entity.LabApplication;
-import org.jeecg.modules.demo.lab_application.mapper.LabApplicationMapper;
-import org.jeecg.modules.demo.lab_application.service.ILabApplicationService;
+import org.jeecg.modules.legacy.lab_application.entity.LabApplication;
+import org.jeecg.modules.legacy.lab_application.mapper.LabApplicationMapper;
+import org.jeecg.modules.legacy.lab_application.service.ILabApplicationService;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -13,7 +13,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
  * @Date:   2026-05-14
  * @Version: V1.0
  */
-@Service
+@Service("legacyLabApplicationServiceImpl")
 public class LabApplicationServiceImpl extends ServiceImpl<LabApplicationMapper, LabApplication> implements ILabApplicationService {
 
 }
